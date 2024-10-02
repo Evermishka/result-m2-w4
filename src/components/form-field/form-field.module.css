@@ -1,0 +1,16 @@
+.input {
+    padding: 10px;
+    font-size: 1rem;
+}
+
+.errorsList {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.errorLabel {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    color: red;
+}
