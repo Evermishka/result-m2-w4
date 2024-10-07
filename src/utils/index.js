@@ -1,5 +1,1 @@
-export {
-	isErrorInEmail,
-	isErrorInPassword,
-	isErrorInPasswordRepeat,
-} from './login-form-validation';
+export { loginFormFieldsSchema } from './login-form-fields-schema';

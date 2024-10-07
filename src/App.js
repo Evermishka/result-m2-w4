@@ -1,69 +1,74 @@
 import styles from './App.module.css';
 import './App.css';
-import { useRef, useEffect } from 'react';
-import { useFormHandler } from './hooks';
+import { useEffect, useRef } from 'react';
 import { LOGIN_FORM } from './consts';
 import { FormField } from './components';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { loginFormFieldsSchema } from './utils';
+
+const sendFormData = (formData) => {
+	console.log('formData', formData);
+};
 
 export const App = () => {
 	const {
-		getState,
-		getError,
-		getIsSubmitDisabled,
-		getIsErrorShown,
-		handleChange,
-		handleBlur,
+		register,
 		handleSubmit,
-	} = useFormHandler();
-	
-	const { email, password, passwordRepeat } = getState();
+		getValues,
+		formState: { errors },
+	} = useForm({
+		defaultValues: {
+			email: '',
+			password: '',
+			passwordRepeat: '',
+		},
+		resolver: yupResolver(loginFormFieldsSchema),
+		mode: 'all',
+	});
 
-	const error = getError();
+	const emailError = errors.email?.message;
+	const passwordError = errors.password?.message;
+	const passwordRepeatError = errors.passwordRepeat?.message;
 
-	const isErrorShown = getIsErrorShown();
+	const isEmptyField = Object.values(getValues()).some((value) => value === '');
 
-	const isSubmitDisabled = getIsSubmitDisabled();
+	const isSubmitDisabled =
+		!!emailError || !!passwordError || !!passwordRepeatError || isEmptyField;
 
 	const submitButtonRef = useRef(null);
 
 	useEffect(() => {
-		submitButtonRef.current.focus();
+		if (!isSubmitDisabled) {
+			submitButtonRef.current.focus();
+		}		
 	}, [isSubmitDisabled]);
 
 	return (
 		<div className="App">
-			<form className={styles.form} onSubmit={handleSubmit}>
+			<form className={styles.form} onSubmit={handleSubmit(sendFormData)}>
 				<FormField
 					fieldType="text"
 					fieldName={LOGIN_FORM.EMAIL}
-					fieldValue={email}
-					error={error}
-					isErrorShown={isErrorShown}
-					handleChange={handleChange}
-					handleBlur={handleBlur}
+					error={emailError}
+					register={register}
 				/>
 				<FormField
-					fieldType="password"
+					fieldType="text"
 					fieldName={LOGIN_FORM.PASSWORD}
-					fieldValue={password}
-					error={error}
-					isErrorShown={isErrorShown}
-					handleChange={handleChange}
-					handleBlur={handleBlur}
+					error={passwordError}
+					register={register}
 				/>
 				<FormField
-					fieldType="password"
+					fieldType="text"
 					fieldName={LOGIN_FORM.PASSWORD_REPEAT}
-					fieldValue={passwordRepeat}
-					error={error}
-					isErrorShown={isErrorShown}
-					handleChange={handleChange}
-					handleBlur={handleBlur}
+					error={passwordRepeatError}
+					register={register}
 				/>
 				<button
 					className={styles.button}
 					type="submit"
-					disabled={isSubmitDisabled()}
+					disabled={isSubmitDisabled}
 					ref={submitButtonRef}
 				>
 					Зарегистрироваться
